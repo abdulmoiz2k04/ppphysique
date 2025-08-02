@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PP Physique Studio - Forge Your Best Self</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            yellow: '#fbff00',
+                        },
+                        dark: {
+                            primary: '#121212',
+                            secondary: '#1a1a1a',
+                            light: '#242424',
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Teko', 'sans-serif'],
+                        sans: ['Roboto', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, #121212, rgba(18, 18, 18, 0.5));
+            z-index: -1;
+        }
+        
+        /* --- Animation Classes --- */
+        .animate-on-scroll {
+            opacity: 0;
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+        .animate-slide-up {
+            transform: translateY(60px);
+        }
+        .animate-fade-in {
+             transform: translateY(30px);
+        }
+        .in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .active-nav {
+            color: #fbff00; /* brand yellow */
+            text-shadow: 0 0 5px #fbff00;
+        }
+        .goal-card {
+            background: rgba(36, 36, 36, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid #242424;
+            transition: all 0.3s ease;
+        }
+        .goal-card:hover {
+            background: rgba(251, 255, 0, 0.1);
+            border-color: #fbff00;
+            transform: translateY(-10px);
+        }
+        .btn-primary {
+            box-shadow: 0 0 15px rgba(251, 255, 0, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 25px rgba(251, 255, 0, 0.6);
+        }
+        
+        /* Timeline */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #242424;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #fbff00;
+            color: #121212;
+            border: 4px solid #1a1a1a;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-dark-primary text-gray-300 font-sans">
+
+    <!-- Header & Navigation -->
+    <header class="bg-dark-primary/80 backdrop-blur-lg shadow-lg shadow-black/20 sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#home" class="text-4xl font-heading tracking-wider text-white">
+                PP PHYSIQUE
+            </a>
+            <div class="hidden lg:flex items-center space-x-8 text-xl font-heading tracking-wide">
+                <a href="#home" class="text-gray-300 hover:text-brand-yellow transition duration-300 active-nav" data-section="home">Home</a>
+                <a href="#programs" class="text-gray-300 hover:text-brand-yellow transition duration-300" data-section="programs">Programs</a>
+                <a href="#transformations" class="text-gray-300 hover:text-brand-yellow transition duration-300" data-section="transformations">Results</a>
+                <a href="#contact" class="text-gray-300 hover:text-brand-yellow transition duration-300" data-section="contact">Contact</a>
+            </div>
+            <div class="hidden lg:flex items-center">
+                <a href="#join" class="bg-brand-yellow hover:bg-yellow-300 text-black font-bold px-6 py-2 rounded-md transition-all duration-300 transform hover:-translate-y-0.5 btn-primary text-lg">Join The Studio</a>
+            </div>
+            <button id="mobile-menu-button" class="lg:hidden text-2xl text-white">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-dark-secondary px-6 pb-4">
+            <a href="#home" class="block py-2 text-gray-300 hover:text-brand-yellow" data-section="home">Home</a>
+            <a href="#programs" class="block py-2 text-gray-300 hover:text-brand-yellow" data-section="programs">Programs</a>
+            <a href="#transformations" class="block py-2 text-gray-300 hover:text-brand-yellow" data-section="transformations">Results</a>
+            <a href="#contact" class="block py-2 text-gray-300 hover:text-brand-yellow" data-section="contact">Contact</a>
+            <div class="mt-4">
+                 <a href="#join" class="block w-full bg-brand-yellow hover:bg-yellow-300 text-black text-center font-bold px-4 py-2 rounded-md transition duration-300 shadow-sm">Join The Studio</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="h-screen flex flex-col justify-end items-center relative text-white pb-20 mt-20">
+            <video autoplay muted loop class="hero-video-bg -mt-20">
+                <source src="https://videos.pexels.com/video-files/5319759/5319759-uhd_2560_1440_25fps.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay -mt-20"></div>
+            <div class="text-center z-10 animate-on-scroll animate-fade-in">
+                <h1 class="text-7xl md:text-9xl font-heading tracking-widest leading-none">FORGE YOUR</h1>
+                <h2 class="text-7xl md:text-9xl font-heading tracking-widest text-brand-yellow">PHYSIQUE</h2>
+                <p class="text-lg md:text-xl mt-4 max-w-2xl mx-auto text-gray-300">Elite personal training and coaching to build the best version of you. No excuses, just results.</p>
+            </div>
+            <!-- Goal Selector -->
+            <div class="w-full max-w-5xl mx-auto px-4 z-10 mt-12 animate-on-scroll animate-slide-up" style="animation-delay: 0.2s;">
+                <h3 class="text-center text-2xl font-heading tracking-wider mb-6">WHAT'S YOUR GOAL?</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <a href="#programs" class="goal-card p-8 text-center rounded-lg">
+                        <i class="fa-solid fa-dumbbell text-5xl text-brand-yellow"></i>
+                        <p class="mt-4 text-2xl font-heading tracking-wider text-white">Build Muscle</p>
+                    </a>
+                     <a href="#programs" class="goal-card p-8 text-center rounded-lg">
+                        <i class="fa-solid fa-fire-flame-curved text-5xl text-brand-yellow"></i>
+                        <p class="mt-4 text-2xl font-heading tracking-wider text-white">Burn Fat</p>
+                    </a>
+                     <a href="#programs" class="goal-card p-8 text-center rounded-lg">
+                        <i class="fa-solid fa-person-running text-5xl text-brand-yellow"></i>
+                        <p class="mt-4 text-2xl font-heading tracking-wider text-white">Improve Performance</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Programs Section -->
+        <section id="programs" class="py-24 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 animate-on-scroll animate-fade-in">
+                    <h2 class="text-5xl md:text-6xl font-heading tracking-wider text-white">TRAINING PROGRAMS</h2>
+                    <p class="text-gray-400 mt-3 max-w-2xl mx-auto">Engineered for results. Choose the path that aligns with your ambition.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Program Card -->
+                    <div class="bg-dark-light rounded-lg overflow-hidden border border-dark-light transform hover:-translate-y-2 transition-all duration-300 animate-on-scroll animate-slide-up shadow-2xl shadow-black/30">
+                        <img src="https://placehold.co/600x400/121212/fbff00?text=1-ON-1+COACHING" alt="1-on-1 Coaching" class="w-full h-56 object-cover">
+                        <div class="p-8">
+                            <h3 class="text-3xl font-heading tracking-wider text-brand-yellow">1-ON-1 COACHING</h3>
+                            <p class="text-gray-400 my-4">The ultimate personalized experience. A plan built entirely around you, your goals, and your lifestyle for maximum results.</p>
+                            <a href="#join" class="font-bold text-white hover:text-brand-yellow">Apply Now <i class="fas fa-arrow-right text-xs ml-1"></i></a>
+                        </div>
+                    </div>
+                    <!-- Program Card -->
+                    <div class="bg-dark-light rounded-lg overflow-hidden border border-dark-light transform hover:-translate-y-2 transition-all duration-300 animate-on-scroll animate-slide-up shadow-2xl shadow-black/30" style="animation-delay: 0.1s">
+                         <img src="https://placehold.co/600x400/121212/fbff00?text=GROUP+TRAINING" alt="Group Training" class="w-full h-56 object-cover">
+                        <div class="p-8">
+                           <h3 class="text-3xl font-heading tracking-wider text-brand-yellow">GROUP TRAINING</h3>
+                            <p class="text-gray-400 my-4">High-energy, small group sessions that push your limits. Motivation from the team, guidance from our expert coaches.</p>
+                            <a href="#join" class="font-bold text-white hover:text-brand-yellow">View Schedule <i class="fas fa-arrow-right text-xs ml-1"></i></a>
+                        </div>
+                    </div>
+                     <!-- Program Card -->
+                    <div class="bg-dark-light rounded-lg overflow-hidden border border-dark-light transform hover:-translate-y-2 transition-all duration-300 animate-on-scroll animate-slide-up shadow-2xl shadow-black/30" style="animation-delay: 0.2s">
+                         <img src="https://placehold.co/600x400/121212/fbff00?text=NUTRITION+PLAN" alt="Nutrition Plan" class="w-full h-56 object-cover">
+                        <div class="p-8">
+                            <h3 class="text-3xl font-heading tracking-wider text-brand-yellow">NUTRITION PLAN</h3>
+                            <p class="text-gray-400 my-4">Fuel your transformation. Custom nutrition protocols designed by our experts to complement your training and accelerate results.</p>
+                            <a href="#join" class="font-bold text-white hover:text-brand-yellow">Learn More <i class="fas fa-arrow-right text-xs ml-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Process Section -->
+        <section id="process" class="py-24 bg-dark-primary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 animate-on-scroll animate-fade-in">
+                    <h2 class="text-5xl md:text-6xl font-heading tracking-wider text-white">THE PROCESS</h2>
+                    <p class="text-gray-400 mt-3 max-w-2xl mx-auto">Your journey to an elite physique, simplified.</p>
+                </div>
+                <div class="max-w-2xl mx-auto">
+                    <!-- Timeline Item -->
+                    <div class="relative pl-16 pb-12 timeline-item animate-on-scroll animate-slide-up">
+                        <div class="timeline-dot">01</div>
+                        <h3 class="text-3xl font-heading tracking-wider text-brand-yellow">CONSULTATION</h3>
+                        <p class="text-gray-400 mt-2">We start with a deep dive into your goals, history, and lifestyle. This is the blueprint for your success.</p>
+                    </div>
+                    <!-- Timeline Item -->
+                    <div class="relative pl-16 pb-12 timeline-item animate-on-scroll animate-slide-up" style="animation-delay: 0.1s;">
+                        <div class="timeline-dot">02</div>
+                        <h3 class="text-3xl font-heading tracking-wider text-brand-yellow">CUSTOM PLAN</h3>
+                        <p class="text-gray-400 mt-2">Your dedicated coach crafts a bespoke training and nutrition plan, engineered specifically for you.</p>
+                    </div>
+                     <!-- Timeline Item -->
+                    <div class="relative pl-16 pb-12 timeline-item animate-on-scroll animate-slide-up" style="animation-delay: 0.2s;">
+                        <div class="timeline-dot">03</div>
+                        <h3 class="text-3xl font-heading tracking-wider text-brand-yellow">EXECUTION</h3>
+                        <p class="text-gray-400 mt-2">Guided by your coach, you'll execute the plan with precision in our state-of-the-art facility. We track every variable.</p>
+                    </div>
+                     <!-- Timeline Item -->
+                    <div class="relative pl-16 timeline-item animate-on-scroll animate-slide-up" style="animation-delay: 0.3s;">
+                        <div class="timeline-dot">04</div>
+                        <h3 class="text-3xl font-heading tracking-wider text-brand-yellow">TRANSFORMATION</h3>
+                        <p class="text-gray-400 mt-2">Consistent effort meets expert guidance. We monitor, adapt, and push you towards a real, sustainable transformation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transformations Section -->
+        <section id="transformations" class="py-24 bg-dark-secondary">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 animate-on-scroll animate-fade-in">
+                    <h2 class="text-5xl md:text-6xl font-heading tracking-wider text-white">REAL CLIENTS. REAL RESULTS.</h2>
+                    <p class="text-gray-400 mt-3 max-w-2xl mx-auto">The proof is in the physique. Our clients' success speaks for itself.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="animate-on-scroll animate-slide-up"><img src="https://placehold.co/600x800/121212/fbff00?text=Before+%26+After+1" class="rounded-lg shadow-2xl shadow-black/30"></div>
+                    <div class="animate-on-scroll animate-slide-up" style="animation-delay: 0.1s;"><img src="https://placehold.co/600x800/121212/fbff00?text=Before+%26+After+2" class="rounded-lg shadow-2xl shadow-black/30"></div>
+                    <div class="animate-on-scroll animate-slide-up" style="animation-delay: 0.2s;"><img src="https://placehold.co/600x800/121212/fbff00?text=Before+%26+After+3" class="rounded-lg shadow-2xl shadow-black/30"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Join Section -->
+        <section id="join" class="py-24 bg-brand-yellow text-black">
+            <div class="container mx-auto px-6 text-center animate-on-scroll animate-fade-in">
+                <h2 class="text-5xl md:text-6xl font-heading tracking-wider">READY TO BUILD YOURS?</h2>
+                <p class="mt-4 text-xl max-w-3xl mx-auto">Stop wishing, start doing. Your transformation begins with a single step. Book your free consultation today and discover your potential.</p>
+                <a href="#contact" class="bg-black hover:bg-gray-800 text-white font-bold py-4 px-10 rounded-md text-xl transition-all duration-300 shadow-2xl transform hover:scale-105 mt-8 inline-block">Book a Free Consultation</a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-black text-white">
+        <div class="container mx-auto px-6 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                <div class="animate-on-scroll animate-slide-up">
+                    <h3 class="text-4xl font-heading tracking-wider text-white mb-4">PP PHYSIQUE</h3>
+                    <p class="text-gray-400">Forge Your Best Self.</p>
+                    <div class="flex space-x-4 mt-6">
+                        <a href="https://www.instagram.com/ppphysique_studio/?hl=en" target="_blank" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-instagram text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-facebook-f text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-youtube text-2xl"></i></a>
+                    </div>
+                </div>
+                <div class="animate-on-scroll animate-slide-up" style="animation-delay: 0.1s">
+                    <h3 class="text-2xl font-heading tracking-wider mb-4">Explore</h3>
+                    <ul>
+                        <li class="mb-2"><a href="#programs" class="text-gray-400 hover:text-white transition-colors">Programs</a></li>
+                        <li class="mb-2"><a href="#process" class="text-gray-400 hover:text-white transition-colors">The Process</a></li>
+                        <li class="mb-2"><a href="#transformations" class="text-gray-400 hover:text-white transition-colors">Results</a></li>
+                    </ul>
+                </div>
+                <div class="animate-on-scroll animate-slide-up" style="animation-delay: 0.2s">
+                    <h3 class="text-2xl font-heading tracking-wider mb-4">Visit Us</h3>
+                    <p class="text-gray-400 mb-2">123 Fitness Drive<br>Minneapolis, MN 55401</p>
+                    <p class="text-gray-400">contact@ppphysique.com</p>
+                </div>
+                <div class="animate-on-scroll animate-slide-up" style="animation-delay: 0.3s">
+                    <h3 class="text-2xl font-heading tracking-wider mb-4">Get Started</h3>
+                    <p class="text-gray-400 mb-4">Book your no-obligation consultation.</p>
+                    <a href="#join" class="bg-brand-yellow hover:bg-yellow-300 text-black font-bold py-3 px-6 rounded-md transition-colors duration-300">Book Now</a>
+                </div>
+            </div>
+            <div class="border-t border-dark-light mt-12 pt-8 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 PP Physique Studio. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Mobile Menu Toggle ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // --- Active Nav Link Highlighting on Scroll ---
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('nav a[data-section]');
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.3 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionId = entry.target.id;
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active-nav', link.dataset.section === sectionId);
+                    });
+                }
+            });
+        }, observerOptions);
+        sections.forEach(section => { observer.observe(section); });
+
+
+        // --- Animate on Scroll ---
+        const animatedEls = document.querySelectorAll('.animate-on-scroll');
+        const animationObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    animationObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        animatedEls.forEach(el => animationObserver.observe(el));
+    });
+    </script>
+</body>
+</html>
