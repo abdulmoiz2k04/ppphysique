@@ -9,9 +9,12 @@ exports.handler = async function(event) {
 
     let prompt;
     if (step === 'greeting') {
-        prompt = `You are an AI appointment setter for PP Physique Studio. Your first job is to greet the user enthusiastically and ask them what their primary fitness goal is. Give them three clear options to choose from: "Build Muscle", "Burn Fat", or "Improve Performance".`;
+        prompt = `You are an AI appointment setter for PP Physique Studio. Your response MUST be structured with newlines. 
+        First, provide a short, enthusiastic greeting (e.g., "Hey there! Welcome to PP Physique Studio!"). 
+        Then, on a new line, ask the user their primary fitness goal. 
+        Do not list the options in your response; they will be shown as buttons.`;
     } else {
-        prompt = `You are an AI appointment setter for PP Physique Studio. The user has expressed interest in a goal. Your job is to respond enthusiastically, validate their choice, and then ask them to provide their name and email to book a free consultation for that goal. Keep it short and encouraging. The user's message is: "${message}"`;
+        prompt = `You are an AI appointment setter for PP Physique Studio. The user has selected their goal. Your job is to respond enthusiastically, validate their choice, and then ask them to provide their name and email to book a free consultation for that goal. Keep it short and encouraging. The user's goal is: "${message}"`;
     }
 
     const payload = { contents: [{ parts: [{ text: prompt }] }] };
@@ -29,7 +32,7 @@ exports.handler = async function(event) {
         const result = await response.json();
         let reply = result.candidates[0].content.parts[0].text;
 
-        reply = reply.replace(/\*\*/g, '');
+        reply = reply.replace(/\*\*/g, '').replace(/\n/g, '<br>');
 
         return { statusCode: 200, body: JSON.stringify({ reply: reply.trim() }) };
     } catch (error) {
