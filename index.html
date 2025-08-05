@@ -135,6 +135,7 @@
             </div>
             <div class="hidden lg:flex items-center">
                 <a href="#join" class="bg-brand-yellow hover:bg-yellow-300 text-black font-bold px-6 py-2 rounded-md transition-all duration-300 transform hover:-translate-y-0.5 btn-primary text-lg">Join The Studio</a>
+                <a href="fitness-dashboard.html" class="ml-2 bg-brand-yellow hover:bg-yellow-300 text-black font-bold px-6 py-2 rounded-md transition-all duration-300 transform hover:-translate-y-0.5 btn-primary text-lg">Dashboard</a>
             </div>
             <button id="mobile-menu-button" class="lg:hidden text-2xl text-white">
                 <i class="fas fa-bars"></i>
@@ -322,6 +323,29 @@
             </div>
         </div>
     </footer>
+    <!-- AI Appointment Setter -->
+    <div id="setter-container" class="fixed bottom-5 right-5 z-50">
+        <!-- Setter Bubble -->
+        <button id="setter-bubble" class="bg-brand-yellow w-16 h-16 rounded-full flex items-center justify-center shadow-2xl shadow-brand-yellow/30 transform hover:scale-110 transition-transform">
+            <i class="fa-solid fa-calendar-check text-black text-2xl"></i>
+        </button>
+        <!-- Setter Window -->
+        <div id="setter-window" class="hidden absolute bottom-20 right-0 w-96 h-[32rem] bg-dark-secondary rounded-2xl shadow-2xl flex flex-col transition-all border border-dark-light">
+            <!-- Header -->
+            <div class="bg-dark-light p-4 rounded-t-2xl text-white text-center">
+                <h3 class="font-heading text-2xl tracking-wider">Book Your Consultation</h3>
+                <p class="text-sm text-gray-400">Let's find the perfect time to start your journey.</p>
+            </div>
+            <!-- Conversation/Form Area -->
+            <div id="setter-body" class="flex-1 p-6 overflow-y-auto">
+                <!-- This will be dynamically populated by the AI conversation -->
+            </div>
+            <!-- Action Buttons -->
+            <div id="setter-actions" class="p-4 border-t border-dark-light">
+                <!-- This will be dynamically populated -->
+            </div>
+        </div>
+    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -361,6 +385,115 @@
         }, { threshold: 0.15 });
         animatedEls.forEach(el => animationObserver.observe(el));
     });
+    // --- AI Appointment Setter Logic ---
+    const setterBubble = document.getElementById('setter-bubble');
+    const setterWindow = document.getElementById('setter-window');
+    const setterBody = document.getElementById('setter-body');
+    const setterActions = document.getElementById('setter-actions');
+    let conversationState = { step: 'greeting', goal: '' };
+
+    setterBubble.addEventListener('click', () => {
+        setterWindow.classList.toggle('hidden');
+        if (!setterWindow.classList.contains('hidden') && conversationState.step === 'greeting') {
+            startConversation();
+        }
+    });
+
+    async function startConversation() {
+        setterBody.innerHTML = '<p class="text-gray-400">AI Assistant is typing...</p>';
+        const response = await getAIResponse('', 'greeting');
+        displayMessage(response.reply, 'bot');
+        displayGoalOptions();
+    }
+
+    async function getAIResponse(message, step) {
+        try {
+            const response = await fetch('/.netlify/functions/appointment-setter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message, step })
+            });
+            if (!response.ok) throw new Error('Network error');
+            return await response.json();
+        } catch (error) {
+            console.error("AI Error:", error);
+            return { reply: "I'm having trouble connecting right now. Please try again soon." };
+        }
+    }
+
+    function displayMessage(message, sender) {
+        if (sender === 'bot') {
+            setterBody.innerHTML = `<p class="text-lg text-white">${message}</p>`;
+        }
+    }
+
+    function displayGoalOptions() {
+        setterActions.innerHTML = `
+            <div class="grid grid-cols-3 gap-2">
+                <button class="goal-btn bg-dark-light p-2 rounded-lg hover:bg-brand-yellow hover:text-black transition-colors" data-goal="Build Muscle">Build Muscle</button>
+                <button class="goal-btn bg-dark-light p-2 rounded-lg hover:bg-brand-yellow hover:text-black transition-colors" data-goal="Burn Fat">Burn Fat</button>
+                <button class="goal-btn bg-dark-light p-2 rounded-lg hover:bg-brand-yellow hover:text-black transition-colors" data-goal="Improve Performance">Improve Performance</button>
+            </div>
+        `;
+        document.querySelectorAll('.goal-btn').forEach(btn => {
+            btn.addEventListener('click', handleGoalSelection);
+        });
+    }
+
+    async function handleGoalSelection(e) {
+        conversationState.goal = e.target.dataset.goal;
+        conversationState.step = 'collect_details';
+        
+        setterBody.innerHTML = '<p class="text-gray-400">AI Assistant is typing...</p>';
+        setterActions.innerHTML = '';
+
+        const response = await getAIResponse(`I want to ${conversationState.goal}`, 'collect_details');
+        displayMessage(response.reply, 'bot');
+        displayForm();
+    }
+
+    function displayForm() {
+        setterBody.innerHTML += `
+            <form id="booking-form" class="mt-4 space-y-4">
+                <input type="text" id="client-name" placeholder="Your Name" required class="w-full p-3 bg-dark-light border border-dark-light rounded-lg text-white focus:ring-2 focus:ring-brand-yellow">
+                <input type="email" id="client-email" placeholder="Your Email" required class="w-full p-3 bg-dark-light border border-dark-light rounded-lg text-white focus:ring-2 focus:ring-brand-yellow">
+                <select id="client-time" class="w-full p-3 bg-dark-light border border-dark-light rounded-lg text-white focus:ring-2 focus:ring-brand-yellow">
+                    <option>Tomorrow at 9:00 AM</option>
+                    <option>Tomorrow at 11:00 AM</option>
+                    <option>Day after tomorrow at 2:00 PM</option>
+                </select>
+                <button type="submit" class="w-full bg-brand-yellow text-black font-bold p-3 rounded-lg hover:bg-yellow-300 transition-colors">Book My Spot</button>
+            </form>
+        `;
+        document.getElementById('booking-form').addEventListener('submit', handleFormSubmission);
+    }
+
+    function handleFormSubmission(e) {
+        e.preventDefault();
+        const appointmentData = {
+            name: document.getElementById('client-name').value,
+            email: document.getElementById('client-email').value,
+            time: document.getElementById('client-time').value,
+            goal: conversationState.goal,
+            timestamp: new Date().toISOString()
+        };
+
+        // Save to localStorage
+        const existingAppointments = JSON.parse(localStorage.getItem('newAppointments')) || [];
+        existingAppointments.push(appointmentData);
+        localStorage.setItem('newAppointments', JSON.stringify(existingAppointments));
+
+        // Show success message
+        setterBody.innerHTML = `
+            <div class="text-center">
+                <i class="fa-solid fa-circle-check text-brand-yellow text-5xl"></i>
+                <p class="text-2xl font-heading text-white mt-4">You're All Set!</p>
+                <p class="text-gray-300 mt-2">We've booked your consultation for ${appointmentData.time}. Check your email for details. We can't wait to see you!</p>
+                <p class="text-xs text-gray-500 mt-6">You can view this demo booking on the <a href="fitness-dashboard.html" target="_blank" class="underline">management dashboard</a>.</p>
+            </div>
+        `;
+        setterActions.innerHTML = '';
+    }
     </script>
 </body>
 </html>

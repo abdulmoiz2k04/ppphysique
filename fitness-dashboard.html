@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PP Physique Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { yellow: '#fbff00' },
+                        dark: { primary: '#121212', secondary: '#1a1a1a', light: '#242424' }
+                    },
+                    fontFamily: { heading: ['Teko', 'sans-serif'], sans: ['Roboto', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        .active-tab {
+            background-color: #fbff00;
+            color: #121212;
+            box-shadow: 0 0 10px #fbff00;
+        }
+    </style>
+</head>
+<body class="bg-dark-primary text-gray-300">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-72 bg-dark-secondary shadow-2xl shadow-black/30">
+            <div class="p-6 text-4xl font-heading tracking-wider text-white border-b border-dark-light">
+                PP DASHBOARD
+            </div>
+            <nav class="mt-6">
+                <button data-target="appointments" class="w-full text-left py-4 px-6 font-heading text-2xl tracking-wide transition-colors tab-button active-tab">
+                    <i class="fa-solid fa-calendar-check w-8"></i> New Appointments
+                </button>
+                <button data-target="members" class="w-full text-left py-4 px-6 font-heading text-2xl tracking-wide text-gray-400 hover:text-white hover:bg-dark-light transition-colors tab-button">
+                    <i class="fa-solid fa-users w-8"></i> Member Management
+                </button>
+                <button data-target="billing" class="w-full text-left py-4 px-6 font-heading text-2xl tracking-wide text-gray-400 hover:text-white hover:bg-dark-light transition-colors tab-button">
+                    <i class="fa-solid fa-credit-card w-8"></i> Membership & Billing
+                </button>
+                <button data-target="classes" class="w-full text-left py-4 px-6 font-heading text-2xl tracking-wide text-gray-400 hover:text-white hover:bg-dark-light transition-colors tab-button">
+                    <i class="fa-solid fa-clock w-8"></i> Class & Session Mgt
+                </button>
+                <button data-target="attendance" class="w-full text-left py-4 px-6 font-heading text-2xl tracking-wide text-gray-400 hover:text-white hover:bg-dark-light transition-colors tab-button">
+                    <i class="fa-solid fa-user-check w-8"></i> Access & Attendance
+                </button>
+                <button data-target="inventory" class="w-full text-left py-4 px-6 font-heading text-2xl tracking-wide text-gray-400 hover:text-white hover:bg-dark-light transition-colors tab-button">
+                    <i class="fa-solid fa-box w-8"></i> Inventory Management
+                </button>
+                <a href="index.html" class="w-full text-left py-4 px-6 font-heading text-2xl tracking-wide text-gray-400 hover:text-white hover:bg-dark-light transition-colors flex items-center gap-4 mt-8 border-t border-dark-light">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Website
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-dark-primary p-8">
+                
+                <!-- Appointments -->
+                <div id="appointments" class="tab-content">
+                    <h1 class="text-5xl font-heading tracking-wider text-white mb-6">New Consultation Requests</h1>
+                    <div class="bg-dark-secondary p-6 rounded-lg shadow-lg">
+                        <table class="w-full text-left text-lg">
+                            <thead>
+                                <tr class="border-b border-dark-light">
+                                    <th class="py-3 font-heading tracking-wider text-brand-yellow">Client</th>
+                                    <th class="py-3 font-heading tracking-wider text-brand-yellow">Goal</th>
+                                    <th class="py-3 font-heading tracking-wider text-brand-yellow">Requested Time</th>
+                                    <th class="py-3 font-heading tracking-wider text-brand-yellow">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointments-table">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                        <p id="no-appointments-message" class="text-center text-gray-500 py-12 text-xl">No new appointment requests. Book one via the AI setter on the website to see it here!</p>
+                    </div>
+                </div>
+
+                <!-- Other Management Sections (Placeholders) -->
+                <div id="members" class="tab-content hidden"><h1 class="text-5xl font-heading text-white">Member Management</h1></div>
+                <div id="billing" class="tab-content hidden"><h1 class="text-5xl font-heading text-white">Membership & Billing</h1></div>
+                <div id="classes" class="tab-content hidden"><h1 class="text-5xl font-heading text-white">Class & Session Management</h1></div>
+                <div id="attendance" class="tab-content hidden"><h1 class="text-5xl font-heading text-white">Access & Attendance</h1></div>
+                <div id="inventory" class="tab-content hidden"><h1 class="text-5xl font-heading text-white">Inventory Management</h1></div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching logic
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const target = button.dataset.target;
+                tabButtons.forEach(btn => btn.classList.remove('active-tab', 'text-gray-400', 'hover:text-white', 'hover:bg-dark-light'));
+                tabButtons.forEach(btn => {
+                    if(btn.dataset.target === target) {
+                        btn.classList.add('active-tab');
+                    } else {
+                        btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-dark-light');
+                    }
+                });
+                tabContents.forEach(content => content.classList.toggle('hidden', content.id !== target));
+            });
+        });
+
+        // Load appointments from localStorage
+        const appointmentsTable = document.getElementById('appointments-table');
+        const noAppointmentsMessage = document.getElementById('no-appointments-message');
+        const appointments = JSON.parse(localStorage.getItem('newAppointments')) || [];
+
+        if (appointments.length > 0) {
+            noAppointmentsMessage.classList.add('hidden');
+            appointments.forEach(appt => {
+                const row = document.createElement('tr');
+                row.classList.add('border-b', 'border-dark-light');
+                row.innerHTML = `
+                    <td class="py-4">
+                        <p class="font-bold text-white">${appt.name}</p>
+                        <p class="text-sm text-gray-400">${appt.email}</p>
+                    </td>
+                    <td class="py-4">${appt.goal}</td>
+                    <td class="py-4">${appt.time}</td>
+                    <td class="py-4"><span class="bg-yellow-400/20 text-yellow-300 text-sm font-medium px-3 py-1 rounded-full">Pending</span></td>
+                `;
+                appointmentsTable.appendChild(row);
+            });
+        } else {
+            noAppointmentsMessage.classList.remove('hidden');
+        }
+    });
+    </script>
+</body>
+</html>
