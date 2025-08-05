@@ -1,4 +1,3 @@
-// netlify/functions/appointment-setter.js
 exports.handler = async function(event) {
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
@@ -9,7 +8,6 @@ exports.handler = async function(event) {
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     let prompt;
-    // The AI's prompt changes based on the conversation step
     if (step === 'greeting') {
         prompt = `You are an AI appointment setter for PP Physique Studio. Your first job is to greet the user enthusiastically and ask them what their primary fitness goal is. Give them three clear options to choose from: "Build Muscle", "Burn Fat", or "Improve Performance".`;
     } else {
@@ -27,9 +25,11 @@ exports.handler = async function(event) {
         });
 
         if (!response.ok) throw new Error(`API request failed`);
-
+        
         const result = await response.json();
-        const reply = result.candidates[0].content.parts[0].text;
+        let reply = result.candidates[0].content.parts[0].text;
+
+        reply = reply.replace(/\*\*/g, '');
 
         return { statusCode: 200, body: JSON.stringify({ reply: reply.trim() }) };
     } catch (error) {
